@@ -52,7 +52,19 @@ def login():
     else:
         return jsonify({"msg":"Credenciales incorrectas"}), 401
 
+#crear el endpoint protegido. Estos endpoints sólo los puede ver el usuario a quien corresponde el webtoken
+@app.route('/datos', methods=['POST'])
+@jwt_required()
+def datos():
+    data = request.get_json()
+    username = data.get('username')
 
+    usuario = mongo.db.users.find_one({"username":username}, {"password": 0})
+    if usuario:
+        usuario["_id"] = str(usuario["_id"])
+        return jsonify({"msg": "Usuario encontrado", "Usuario": usuario}), 200
+    else:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
 
 @app.route('/userlist', methods=['GET'])
 def get_users():
