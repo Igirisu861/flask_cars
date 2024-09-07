@@ -25,9 +25,25 @@ def register():
     password = data.get('password')
 
     #hay que verificar si existe y asegurarnos de que no se repita
+    if mongo.db.users.find_one({'email': email}):
+        return jsonify({'msg': 'El usuario ya existe'}), 400 #es básicamente lo mismo que en Node
     
-    
+    hashed_password = Bcrypt.generate_password_hash(password).decode('utf-8')
 
+
+    result = mongo.db.users.insert_one({"username": username, "email": email, "password": hashed_password})
+    if result.acknowledged:
+        return jsonify({"msg": "Usuario creado correctamente"}), 201
+    else:
+        return jsonify({"msg": "Hubo un error, los datos no fueron registrados"}), 400
+
+@app.route('/userlist', methods=['GET'])
+def get_users():
+    user_list=[]
+    for item in mongo.db.users.find({},{"_id":0, "username": 1, "email":1}):
+        user_list.append({"username":item['username'], "email": item['email']})
+
+    return jsonify(user_list)
 
 
 if __name__ == '__main__':
