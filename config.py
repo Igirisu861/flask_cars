@@ -5,6 +5,6 @@ load_dotenv()
 
 class Config:
     MONGO_URI = os.getenv("MONGO_URI")
-    JWT_SECRET = os.getenv("JWT_SECRET")
+    SECRET_KEY = os.getenv("SECRET_KEY") #esto debe llamarse SECRET_KEY
 
     
